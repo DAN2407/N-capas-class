@@ -1,8 +1,9 @@
 package com.danarg.pncontrollerseccion01.controllers;
 
 import com.danarg.pncontrollerseccion01.domain.dtos.GeneralResponse;
-import com.danarg.pncontrollerseccion01.domain.dtos.LoginDTO;
+
 import com.danarg.pncontrollerseccion01.domain.dtos.UserEditDTO;
+import com.danarg.pncontrollerseccion01.domain.dtos.UserLoginDTO;
 import com.danarg.pncontrollerseccion01.domain.dtos.UserRegisterDTO;
 import com.danarg.pncontrollerseccion01.domain.entities.User;
 import com.danarg.pncontrollerseccion01.services.UserService;
@@ -21,7 +22,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<GeneralResponse> login (@RequestBody @Valid LoginDTO info) {
+    public ResponseEntity<GeneralResponse> login (@RequestBody @Valid UserLoginDTO info) {
         User user = userService.findByIdentifier(info.getIdentifier());
 
         if (user == null) {
@@ -58,9 +59,23 @@ public class AuthController {
             return GeneralResponse.getResponse(HttpStatus.NOT_FOUND, "User not found");
         }
 
-        userService.editUser(info, user);
+        userService.edit(info);
 
         return GeneralResponse.getResponse(HttpStatus.OK, "User updated");
+    }
+
+    //delete
+    @DeleteMapping("/delete/{username}")
+    public ResponseEntity<GeneralResponse> delete (@PathVariable String username) {
+        User user = userService.findByIdentifier(username);
+
+        if (user == null) {
+            return GeneralResponse.getResponse(HttpStatus.NOT_FOUND, "User not found");
+        }
+
+        userService.deleteUser(user.getId());
+
+        return GeneralResponse.getResponse(HttpStatus.OK, "User deleted");
     }
 
 

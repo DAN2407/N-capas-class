@@ -10,12 +10,12 @@ import java.util.UUID;
 @Table(name = "Sec01_users")
 @Data
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID Id;
+    @Id @GeneratedValue(strategy = GenerationType.UUID) private UUID id;
     private String username;
     private String email;
+    @Convert(converter = Encrypter.class)
     private String password;
-    private String role;
-    private boolean active;
+
+    @Column(nullable = false)
+    private boolean enabled;
 }

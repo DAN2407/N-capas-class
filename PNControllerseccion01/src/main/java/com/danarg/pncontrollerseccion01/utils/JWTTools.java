@@ -3,7 +3,8 @@ package com.danarg.pncontrollerseccion01.utils;
 import com.danarg.pncontrollerseccion01.domain.entities.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import lombok.Value;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;

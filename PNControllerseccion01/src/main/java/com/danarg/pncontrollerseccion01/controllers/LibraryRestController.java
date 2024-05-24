@@ -5,6 +5,7 @@ import com.danarg.pncontrollerseccion01.domain.dtos.GeneralResponse;
 import com.danarg.pncontrollerseccion01.domain.dtos.SaveBookDTO;
 import com.danarg.pncontrollerseccion01.domain.entities.Book;
 import com.danarg.pncontrollerseccion01.domain.entities.BookLoan;
+import com.danarg.pncontrollerseccion01.domain.entities.Category;
 import com.danarg.pncontrollerseccion01.domain.entities.User;
 import com.danarg.pncontrollerseccion01.services.BookLoanService;
 import com.danarg.pncontrollerseccion01.services.BookService;
@@ -78,34 +79,40 @@ public class LibraryRestController {
         return GeneralResponse.getResponse(HttpStatus.OK, "Book updated", null);
     }
 
+    //categories
+
+    @PostMapping("/category")
+    public ResponseEntity<GeneralResponse> saveCategory(@RequestBody Category category) {
+        categoryService.save(category);
+        return GeneralResponse.getResponse(HttpStatus.CREATED, "CategorÃ­a guardada");
+    }
+
     @GetMapping("/categories")
-    public ResponseEntity<?> getCategories(){
-        return GeneralResponse.getResponse(HttpStatus.OK, "Categories found", bookService.getCategories());
-
+    public ResponseEntity<GeneralResponse> findAllCategories() {
+        return GeneralResponse.getResponse(HttpStatus.OK, "Categorias encontradas", categoryService.findAllCategories());
     }
 
-    @PostMapping("/categories")
-    public ResponseEntity<?> saveCategory(@RequestParam String name){
-        bookService.saveCategory(name);
-        return GeneralResponse.getResponse(HttpStatus.OK, "Category saved", null);
+    @GetMapping("/category/{code}")
+    public ResponseEntity<GeneralResponse> findCategoryByCode(@PathVariable String code) {
+
+        Category category = categoryService.findCategoryByCode(code);
+
+        if (category == null) {
+            return GeneralResponse.getResponse(HttpStatus.NOT_FOUND, "Categoria no encontrada");
+        }
+        return GeneralResponse.getResponse(HttpStatus.OK, category);
     }
 
-    @DeleteMapping("/categories/{name}")
-    public ResponseEntity<?> deleteCategory(@PathVariable String name){
-        bookService.deleteCategory(name);
-        return GeneralResponse.getResponse(HttpStatus.OK, "Category deleted", null);
-    }
-
-    @PutMapping("/categories/{name}")
-    public ResponseEntity<?> updateCategory(@PathVariable String name, @RequestParam String newName){
-        bookService.updateCategory(name, newName);
-        return GeneralResponse.getResponse(HttpStatus.OK, "Category updated", null);
+    @DeleteMapping("/category/{name}")
+    public ResponseEntity<GeneralResponse> deleteCategoryByName(@PathVariable String name) {
+        categoryService.deleteByName(name);
+        return GeneralResponse.getResponse(HttpStatus.OK, "Categoria eliminada");
     }
 
 //Loans
     @PostMapping("/loan-book")
     public ResponseEntity<GeneralResponse> loanBook(@RequestBody @Valid CreateBookLoanDTO info){
-        User user = userService.findByUsernameOrEmail(info.getUsername());
+        User user = userService.findByUsernameOrEmail(info.getUsername(), info.getUsername());
         if(user == null){
             return GeneralResponse.getResponse(HttpStatus.BAD_REQUEST, "User not found", null);
         }
@@ -149,7 +156,10 @@ public class LibraryRestController {
         return GeneralResponse.getResponse(HttpStatus.OK, "Active loans found", loanService.findAlActive());
     }
 
-
+    @PostMapping("/active-loans")
+    public ResponseEntity<GeneralResponse> getActiveLoansByUser(@RequestBody User user){
+        return GeneralResponse.getResponse(HttpStatus.OK, "Active loans found", loanService.findAllByUser(user));
+    }
 
 
 }

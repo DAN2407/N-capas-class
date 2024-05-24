@@ -29,7 +29,10 @@
     const createBookElement = (info) => {
         const holder = document.createElement("tr");
         holder.dataset.id = info.isbn;
-        holder.innerHTML=
+        holder.innerHTML=`
+            <td>${info.isbn}</td>
+            <td>${info.title}</td>
+        `;
     }
 
     const renderTable = async () => {
