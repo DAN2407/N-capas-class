@@ -4,11 +4,16 @@ import com.danarg.pncontrollerseccion01.domain.dtos.ChangePasswordDTO;
 import com.danarg.pncontrollerseccion01.domain.dtos.UserEditDTO;
 import com.danarg.pncontrollerseccion01.domain.dtos.UserRegisterDTO;
 import com.danarg.pncontrollerseccion01.domain.dtos.UserResponseDTO;
+import com.danarg.pncontrollerseccion01.domain.entities.Token;
 import com.danarg.pncontrollerseccion01.domain.entities.User;
+import com.danarg.pncontrollerseccion01.repositories.TokenRepository;
 import com.danarg.pncontrollerseccion01.repositories.UserRepository;
 import com.danarg.pncontrollerseccion01.services.UserService;
+import com.danarg.pncontrollerseccion01.utils.JWTTools;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +23,13 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private JWTTools jwtTools;
+
+    @Autowired
+    private TokenRepository tokenRepository;
+
 
     private final UserRepository userRepository;
 
@@ -97,5 +109,64 @@ public class UserServiceImpl implements UserService {
             user.setEmail(info.getEmail());
             userRepository.save(user);
         }
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public Token registerToken(User user) throws Exception {
+        cleanTokens(user);
+
+        String tokenString = jwtTools.generateToken(user);
+        Token token = new Token(tokenString, user);
+
+        tokenRepository.save(token);
+
+        return token;
+    }
+
+    @Override
+    public Boolean isTokenValid(User user, String token) {
+        try {
+            cleanTokens(user);
+            List<Token> tokens = tokenRepository.findByUserAndActive(user, true);
+
+            tokens.stream()
+                    .filter(tk -> tk.getContent().equals(token))
+                    .findAny()
+                    .orElseThrow(() -> new Exception());
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void cleanTokens(User user) throws Exception {
+        List<Token> tokens = tokenRepository.findByUserAndActive(user, true);
+
+        tokens.forEach(token -> {
+            if(!jwtTools.verifyToken(token.getContent())) {
+                token.setActive(false);
+                tokenRepository.save(token);
+            }
+        });
+
+    }
+
+    @Override
+    public User findOneByIdentifier(String username) {
+        return userRepository.findByUsernameOrEmail(username, username).orElse(null);
+    }
+
+    @Override
+    public User findUserAuthenticated() {
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        return userRepository.findOneByUsernameOrEmail(username, username);
     }
 }

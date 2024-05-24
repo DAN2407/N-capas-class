@@ -4,6 +4,7 @@ import com.danarg.pncontrollerseccion01.domain.dtos.ChangePasswordDTO;
 import com.danarg.pncontrollerseccion01.domain.dtos.UserEditDTO;
 import com.danarg.pncontrollerseccion01.domain.dtos.UserRegisterDTO;
 import com.danarg.pncontrollerseccion01.domain.dtos.UserResponseDTO;
+import com.danarg.pncontrollerseccion01.domain.entities.Token;
 import com.danarg.pncontrollerseccion01.domain.entities.User;
 
 import java.util.List;
@@ -29,6 +30,13 @@ public interface UserService {
 
     void edit(UserEditDTO info);
 
+    Token registerToken(User user) throws Exception;
+    Boolean isTokenValid(User user, String token);
+    void cleanTokens(User user) throws Exception;
 
 
+    User findOneByIdentifier(String username);
+
+    //Find User authenticated
+    User findUserAuthenticated();
 }

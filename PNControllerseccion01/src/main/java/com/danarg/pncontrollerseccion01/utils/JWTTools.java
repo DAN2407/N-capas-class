@@ -1,6 +1,7 @@
 package com.danarg.pncontrollerseccion01.utils;
 
 import com.danarg.pncontrollerseccion01.domain.entities.User;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
@@ -29,5 +30,34 @@ public class JWTTools {
                 .expiration(new Date(System.currentTimeMillis() + exp))
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .compact();
+    }
+
+    public Boolean verifyToken(String token) {
+        try {
+            JwtParser parser = Jwts.parser()
+                    .verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
+                    .build();
+
+            parser.parse(token);
+            return true;
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public String getUsernameFrom(String token) {
+        try {
+            JwtParser parser = Jwts.parser()
+                    .verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
+                    .build();
+
+            return parser.parseSignedClaims(token)
+                    .getPayload()
+                    .getSubject();
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return null;
+        }
     }
 }

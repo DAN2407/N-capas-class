@@ -1,15 +1,14 @@
 package com.danarg.pncontrollerseccion01.controllers;
 
-import com.danarg.pncontrollerseccion01.domain.dtos.GeneralResponse;
+import com.danarg.pncontrollerseccion01.domain.dtos.*;
 
-import com.danarg.pncontrollerseccion01.domain.dtos.UserEditDTO;
-import com.danarg.pncontrollerseccion01.domain.dtos.UserLoginDTO;
-import com.danarg.pncontrollerseccion01.domain.dtos.UserRegisterDTO;
+import com.danarg.pncontrollerseccion01.domain.entities.Token;
 import com.danarg.pncontrollerseccion01.domain.entities.User;
 import com.danarg.pncontrollerseccion01.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,18 +21,20 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<GeneralResponse> login (@RequestBody @Valid UserLoginDTO info) {
+    public ResponseEntity<?> login(@ModelAttribute @Valid UserLoginDTO info, BindingResult validations){
         User user = userService.findByIdentifier(info.getIdentifier());
 
-        if (user == null) {
-            return GeneralResponse.getResponse(HttpStatus.UNAUTHORIZED, "User not found");
+        if(validations.hasErrors()){
+            return GeneralResponse.getResponse(HttpStatus.BAD_REQUEST, "Errors in the form", validations.getAllErrors());
+        }
+        try {
+            Token token = userService.registerToken(user);
+            return new ResponseEntity<>(new TokenDTO(token), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        if (!userService.checkPassword(user, info.getPassword())) {
-            return GeneralResponse.getResponse(HttpStatus.UNAUTHORIZED, "Invalid password");
-        }
-
-        return GeneralResponse.getResponse(HttpStatus.OK, "Login successful");
     }
 
     @PostMapping("/register")
@@ -77,6 +78,7 @@ public class AuthController {
 
         return GeneralResponse.getResponse(HttpStatus.OK, "User deleted");
     }
+
 
 
 }
