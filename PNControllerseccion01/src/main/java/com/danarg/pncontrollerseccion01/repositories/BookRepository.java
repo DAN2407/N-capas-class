@@ -8,8 +8,8 @@ import java.util.UUID;
 
 public interface BookRepository extends JpaRepository<Book, UUID>{
 
-    Optional<Book> findByIsnb(String isbn);
+    Optional<Book> findByIsbn(String isbn);
 
-    void deleteByIsnb(String isbn);
+    void deleteByIsbn(String isbn);
 
 }

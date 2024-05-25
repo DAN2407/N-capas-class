@@ -1,8 +1,7 @@
-package com.danarg.pncontrollerseccion01.domain.entities;
+package com.springdemo.clasencapas.controllers.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.persistence.Id;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +14,8 @@ import java.util.UUID;
 @Table(name = "Sec01_users")
 @Data
 public class User implements UserDetails {
-    @Id @GeneratedValue(strategy = GenerationType.UUID) private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID) private UUID id;
     private String username;
     private String email;
     private String password;

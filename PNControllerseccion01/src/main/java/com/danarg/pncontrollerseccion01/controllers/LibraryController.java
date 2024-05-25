@@ -56,13 +56,13 @@ public class LibraryController {
 
     @GetMapping("/delete")
     public String deleteBook(String isbn){
-        bookService.deleteByIsnb(isbn);
+        bookService.deleteByIsbn(isbn);
         return "redirect:/library/all";
     }
 
     @GetMapping("/edit")
     public String editBook(String isbn, Model model){
-        Book book = bookService.findByIsnb(isbn);
+        Book book = bookService.findByIsbn(isbn);
         model.addAttribute("book", book);
         return "save-book";
     }

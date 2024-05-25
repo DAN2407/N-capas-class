@@ -60,12 +60,12 @@ public class LibraryRestController {
 
     @GetMapping("/find/{isbn}")
     public ResponseEntity<?> findBook(@PathVariable String isbn){
-        return GeneralResponse.getResponse(HttpStatus.OK, "Book found", bookService.findByIsnb(isbn));
+        return GeneralResponse.getResponse(HttpStatus.OK, "Book found", bookService.findByIsbn(isbn));
     }
 
     @DeleteMapping("/delete/{isbn}")
     public ResponseEntity<?> deleteBook(@PathVariable String isbn){
-        bookService.deleteByIsnb(isbn);
+        bookService.deleteByIsbn(isbn);
         return GeneralResponse.getResponse(HttpStatus.OK, "Book deleted", null);
     }
 
@@ -74,7 +74,7 @@ public class LibraryRestController {
         if(errors.hasErrors()){
             return GeneralResponse.getResponse(HttpStatus.BAD_REQUEST, "Errors in the form", errors.getAllErrors());
         }
-        bookService.deleteByIsnb(isbn);
+        bookService.deleteByIsbn(isbn);
         bookService.save(info);
         return GeneralResponse.getResponse(HttpStatus.OK, "Book updated", null);
     }
@@ -117,7 +117,7 @@ public class LibraryRestController {
             return GeneralResponse.getResponse(HttpStatus.BAD_REQUEST, "User not found", null);
         }
 
-        Book book = bookService.findByIsnb(info.getISBN());
+        Book book = bookService.findByIsbn(info.getISBN());
         if(book == null){
             return GeneralResponse.getResponse(HttpStatus.BAD_REQUEST, "Book not found", null);
         }
@@ -132,7 +132,7 @@ public class LibraryRestController {
 
     @PostMapping("/return-book/{isbn}")
     public ResponseEntity<GeneralResponse> returnBook(@PathVariable String isbn){
-        Book book = bookService.findByIsnb(isbn);
+        Book book = bookService.findByIsbn(isbn);
         if(book == null){
             return GeneralResponse.getResponse(HttpStatus.BAD_REQUEST, "Book not found", null);
         }

@@ -8,6 +8,6 @@ import java.util.List;
 public interface BookService {
     void save(SaveBookDTO info);
     List<Book> FindAll();
-    Book findByIsnb(String isbn);
-    void deleteByIsnb(String isbn);
+    Book findByIsbn(String isbn);
+    void deleteByIsbn(String isbn);
 }

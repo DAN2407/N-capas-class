@@ -19,7 +19,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void save(SaveBookDTO info) {
-        Book book = this.findByIsnb(info.getISBN());
+        Book book = this.findByIsbn(info.getISBN());
 
         if(book == null){
             book = new Book();
@@ -32,12 +32,12 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book findByIsnb(String isbn) {
-        return bookRepository.findByIsnb(isbn).orElse(null);
+    public Book findByIsbn(String isbn) {
+        return bookRepository.findByIsbn(isbn).orElse(null);
     }
 
     @Override
-    public void deleteByIsnb(String isbn) {
-        bookRepository.deleteByIsnb(isbn);
+    public void deleteByIsbn(String isbn) {
+        bookRepository.deleteByIsbn(isbn);
     }
 }
