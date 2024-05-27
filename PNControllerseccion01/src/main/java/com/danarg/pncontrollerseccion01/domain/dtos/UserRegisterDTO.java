@@ -16,4 +16,8 @@ public class UserRegisterDTO {
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$")
     //TODO: pattern seguro
     private String password;
+
+
+
+
 }

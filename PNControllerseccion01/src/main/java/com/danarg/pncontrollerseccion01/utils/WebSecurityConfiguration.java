@@ -68,7 +68,7 @@ public class WebSecurityConfiguration {
         //Statelessness
         http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        //UnAunthorized handler
+        //Unauthorized handler
         http.exceptionHandling(handling -> handling.authenticationEntryPoint((req, res, ex) -> {
             res.sendError(
                     HttpServletResponse.SC_UNAUTHORIZED,
