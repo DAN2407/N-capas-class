@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(UserInfo.getUsername());
         user.setEmail(UserInfo.getEmail());
         user.setPassword(UserInfo.getPassword());
-        user.setEnabled(true);
+        user.setActive(true);
 
         userRepository.save(user);
     }
@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
         User user = findByUUID(uuid);
 
         if (user != null) {
-            user.setEnabled(false);
+            user.setActive(false);
             userRepository.save(user);
         }
     }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.persistence.Id;
 import lombok.Data;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -20,9 +21,8 @@ public class User implements UserDetails {
     private String email;
     private String password;
     @Column(name = "active", insertable = false)
+    @ColumnDefault(value = "true")
     private Boolean active;
-    @Column(nullable = false)
-    private boolean enabled;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
