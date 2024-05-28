@@ -7,5 +7,5 @@ CREATE TABLE public."token" (
                                 "timestamp" timestamp without time zone NULL DEFAULT CURRENT_TIMESTAMP,
                                 user_code uuid NULL,
                                 CONSTRAINT token_pk PRIMARY KEY (code),
-                                CONSTRAINT token_fk FOREIGN KEY (user_code) REFERENCES public."user"(code) ON DELETE CASCADE ON UPDATE CASCADE
+                                CONSTRAINT token_fk FOREIGN KEY (user_code) REFERENCES public."Sec01_users"(code) ON DELETE CASCADE ON UPDATE CASCADE
 );

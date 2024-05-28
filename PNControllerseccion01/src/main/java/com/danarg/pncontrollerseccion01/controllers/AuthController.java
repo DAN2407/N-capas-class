@@ -38,16 +38,22 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<GeneralResponse> register (@RequestBody @Valid UserRegisterDTO info) {
+    public ResponseEntity<GeneralResponse> register(@RequestBody @Valid UserRegisterDTO info, BindingResult validations) {
         User user = userService.findByUsernameOrEmail(info.getUsername(), info.getEmail());
 
-        if (user != null) {
-            return GeneralResponse.getResponse(HttpStatus.BAD_REQUEST, "User already exists");
+        if(validations.hasErrors()){
+            return GeneralResponse.getResponse(HttpStatus.BAD_REQUEST, "Errors in the form", validations.getAllErrors());
         }
-
-        userService.register(info);
-
-        return GeneralResponse.getResponse(HttpStatus.CREATED, "User created");
+        try {
+            if(user != null){
+                return GeneralResponse.getResponse(HttpStatus.CONFLICT, "User already exists");
+            }
+            userService.register(info);
+            return GeneralResponse.getResponse(HttpStatus.OK, "User registered");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return GeneralResponse.getResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Error registering user");
+        }
 
     }
 
