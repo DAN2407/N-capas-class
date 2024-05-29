@@ -13,29 +13,16 @@ import java.util.UUID;
 public interface UserService {
 
     User findByIdentifier(String identifier);
-
     User findByUsernameOrEmail(String username, String email);
-
-    User findByUUID(UUID uuid);
-
-    List<UserResponseDTO> findAll();
-
-    void register(UserRegisterDTO userRegisterDTO);
-
-    void changePassword(ChangePasswordDTO info);
-
-    void deleteUser(UUID uuid);
-
+    void create(UserRegisterDTO info);
+    void toggleEnable(String username);
     boolean checkPassword(User user, String password);
-
     void edit(UserEditDTO info);
-
     Token registerToken(User user) throws Exception;
     Boolean isTokenValid(User user, String token);
     void cleanTokens(User user) throws Exception;
+    boolean isActive(User user);
 
-
-    User findOneByIdentifier(String username);
 
     //Find User authenticated
     User findUserAuthenticated();

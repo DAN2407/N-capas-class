@@ -7,12 +7,8 @@ import lombok.Data;
 @Data
 public class ChangePasswordDTO {
     @NotBlank
-    private String identifier;
-
-    @NotBlank
     private String oldPassword;
-
-    @NotBlank
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$")
+    @NotBlank(message = "La contraseña no puede estar vacía")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y caracteres especiales")
     private String newPassword;
 }

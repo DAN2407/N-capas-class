@@ -11,80 +11,63 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
     private final UserService userService;
 
     public AuthController(UserService userService) {
         this.userService = userService;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@ModelAttribute @Valid UserLoginDTO info, BindingResult validations){
-        User user = userService.findByIdentifier(info.getIdentifier());
 
-        if(validations.hasErrors()){
-            return GeneralResponse.getResponse(HttpStatus.BAD_REQUEST, "Errors in the form", validations.getAllErrors());
-        }
-        try {
-            Token token = userService.registerToken(user);
-            return new ResponseEntity<>(new TokenDTO(token), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-    }
 
     @PostMapping("/register")
-    public ResponseEntity<GeneralResponse> register(@RequestBody @Valid UserRegisterDTO info, BindingResult validations) {
+    public ResponseEntity<GeneralResponse> register(@RequestBody @Valid UserRegisterDTO info) {
         User user = userService.findByUsernameOrEmail(info.getUsername(), info.getEmail());
+        if(user != null){
+            return GeneralResponse.getResponse(HttpStatus.CONFLICT, "User already exists");
+        }
 
-        if(validations.hasErrors()){
-            return GeneralResponse.getResponse(HttpStatus.BAD_REQUEST, "Errors in the form", validations.getAllErrors());
-        }
-        try {
-            if(user != null){
-                return GeneralResponse.getResponse(HttpStatus.CONFLICT, "User already exists");
-            }
-            userService.register(info);
-            return GeneralResponse.getResponse(HttpStatus.OK, "User registered");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return GeneralResponse.getResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Error registering user");
-        }
+        userService.create(info);
+        return GeneralResponse.getResponse(HttpStatus.CREATED, "User registered successfully");
 
     }
 
-    //edit
-    @PatchMapping("/edit")
-    public ResponseEntity<GeneralResponse> edit (@RequestBody @Valid UserEditDTO info) {
-        User user = userService.findByIdentifier(info.getUsername());
+    @PostMapping("/login")
+    public ResponseEntity<GeneralResponse> login(@ModelAttribute @Valid UserLoginDTO info) throws Exception {
+        User user = userService.findByIdentifier(info.getIdentifier());
+        if(user == null){
+            return GeneralResponse.getResponse(HttpStatus.CONFLICT, "User not found");
+        }
 
-        if (user == null) {
+        if(!userService.checkPassword(user, info.getPassword()) || !userService.isActive(user)){
             return GeneralResponse.getResponse(HttpStatus.NOT_FOUND, "User not found");
         }
 
-        userService.edit(info);
+        Token token = userService.registerToken(user);
+        return GeneralResponse.getResponse(HttpStatus.OK, new TokenDTO(token));
+        }
 
-        return GeneralResponse.getResponse(HttpStatus.OK, "User updated");
-    }
+    @PatchMapping("/toggle-active")
+    public ResponseEntity<?> toggleActive(@RequestBody @Valid UserChangesDTO info) {
+        String username = info.getUsername();
 
-    //delete
-    @DeleteMapping("/delete/{username}")
-    public ResponseEntity<GeneralResponse> delete (@PathVariable String username) {
         User user = userService.findByIdentifier(username);
 
         if (user == null) {
-            return GeneralResponse.getResponse(HttpStatus.NOT_FOUND, "User not found");
+            return ResponseEntity.notFound().build();
         }
 
-        userService.deleteUser(user.getId());
+        userService.toggleEnable(username);
 
-        return GeneralResponse.getResponse(HttpStatus.OK, "User deleted");
+        return GeneralResponse.getResponse(HttpStatus.OK,"Toggle Active");
     }
 
 
 
 }
+
+

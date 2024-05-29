@@ -20,12 +20,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
-public class JWTTokenFIlter extends OncePerRequestFilter {
-    @Autowired
-    JWTTools jwtTools;
+public class JWTTokenFilter extends OncePerRequestFilter {
 
-    @Autowired
-    UserService userService;
+    private final JWTTools jwtTools;
+
+    private final UserService userService;
+
+    public JWTTokenFilter(JWTTools jwtTools, UserService userService) {
+        this.jwtTools = jwtTools;
+        this.userService = userService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -52,7 +56,7 @@ public class JWTTokenFIlter extends OncePerRequestFilter {
         }
 
         if(username != null && token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user = userService.findOneByIdentifier(username);
+            User user = userService.findByIdentifier(username);
 
             if(user != null) {
                 Boolean tokenValidity = userService.isTokenValid(user, token);

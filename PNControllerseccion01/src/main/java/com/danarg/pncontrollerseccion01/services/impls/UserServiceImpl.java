@@ -1,6 +1,5 @@
 package com.danarg.pncontrollerseccion01.services.impls;
 
-import com.danarg.pncontrollerseccion01.domain.dtos.ChangePasswordDTO;
 import com.danarg.pncontrollerseccion01.domain.dtos.UserEditDTO;
 import com.danarg.pncontrollerseccion01.domain.dtos.UserRegisterDTO;
 import com.danarg.pncontrollerseccion01.domain.dtos.UserResponseDTO;
@@ -12,30 +11,41 @@ import com.danarg.pncontrollerseccion01.services.UserService;
 import com.danarg.pncontrollerseccion01.utils.JWTTools;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private JWTTools jwtTools;
-
-    @Autowired
-    private TokenRepository tokenRepository;
-
+    private final JWTTools jwtTools;
+    private final TokenRepository tokenRepository;
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository) {
+
+
+    public UserServiceImpl(UserRepository userRepository, JWTTools jwtTools, TokenRepository tokenRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.jwtTools = jwtTools;
+        this.tokenRepository = tokenRepository;
+        this.passwordEncoder = passwordEncoder;
     }
+
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void create(UserRegisterDTO info) {
+        User user = new User();
+        user.setUsername(info.getUsername());
+        user.setEmail(info.getEmail());
+        user.setPassword(passwordEncoder.encode(info.getPassword()));
+        userRepository.save(user);
+    }
+
 
     @Override
     public User findByIdentifier(String identifier) {
@@ -44,56 +54,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUsernameOrEmail(String username, String email) {
-        return userRepository.findByUsernameOrEmail(username, email).filter(User::isEnabled).orElse(null);
+        return userRepository.findByUsernameOrEmail(username, email).orElse(null);
     }
 
-    @Override
-    public User findByUUID(UUID uuid) {
-        return userRepository.findById(uuid).filter(User::isEnabled).orElse(null);
-    }
 
     @Override
-    public List<UserResponseDTO> findAll() {
-        return userRepository.findAll()
-                .stream()
-                .filter(User::isEnabled)
-                .map(user -> new UserResponseDTO(user.getUsername(), user.getEmail()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(rollbackOn = Exception.class)
-    public void register(UserRegisterDTO UserInfo) {
-        User user = new User();
-
-        user.setUsername(UserInfo.getUsername());
-        user.setEmail(UserInfo.getEmail());
-        user.setPassword(UserInfo.getPassword());
-        user.setActive(true);
-
+    public void toggleEnable(String username) {
+        User user = userRepository.findByUsernameOrEmail(username, username).orElse(null);
+        assert user != null;
+        user.setActive(!user.getActive());
         userRepository.save(user);
-    }
-
-    @Override
-    @Transactional(rollbackOn = Exception.class)
-    public void changePassword(ChangePasswordDTO info) {
-        User user = findByIdentifier(info.getIdentifier());
-
-        if (user != null) {
-            user.setPassword(info.getNewPassword());
-            userRepository.save(user);
-        }
-    }
-
-    @Override
-    @Transactional(rollbackOn = Exception.class)
-    public void deleteUser(UUID uuid) {
-        User user = findByUUID(uuid);
-
-        if (user != null) {
-            user.setActive(false);
-            userRepository.save(user);
-        }
     }
 
     @Override
@@ -156,9 +126,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findOneByIdentifier(String username) {
-        return userRepository.findByUsernameOrEmail(username, username).orElse(null);
+    public boolean isActive(User user) {
+        return user.getActive();
     }
+
 
     @Override
     public User findUserAuthenticated() {
@@ -167,6 +138,10 @@ public class UserServiceImpl implements UserService {
                 .getAuthentication()
                 .getName();
 
-        return userRepository.findOneByUsernameOrEmail(username, username);
+        return userRepository.findByUsernameOrEmail(username, username).orElse(null);
+
     }
+
 }
+
+
