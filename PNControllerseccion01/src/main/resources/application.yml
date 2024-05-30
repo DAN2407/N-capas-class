@@ -6,7 +6,7 @@ spring:
   mustache:
     suffix: .html
   datasource:
-    url: jdbc:postgresql://localhost:5432/pnc_controller
+    url: jdbc:postgresql://localhost:5432/test_n
     username: postgres
     password: 12345678Aa!
   jpa:

@@ -34,7 +34,7 @@ public class User implements UserDetails {
     @Column(nullable = false, length = 64)
     private String password;
 
-    @Column(name = "active", insertable = false)
+    @Column(insertable = false)
     @ColumnDefault(value = "true")
     private Boolean active;
 

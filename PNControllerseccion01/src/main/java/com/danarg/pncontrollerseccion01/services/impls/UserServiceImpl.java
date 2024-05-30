@@ -1,21 +1,18 @@
 package com.danarg.pncontrollerseccion01.services.impls;
 
-import com.danarg.pncontrollerseccion01.domain.dtos.UserEditDTO;
 import com.danarg.pncontrollerseccion01.domain.dtos.UserRegisterDTO;
-import com.danarg.pncontrollerseccion01.domain.dtos.UserResponseDTO;
 import com.danarg.pncontrollerseccion01.domain.entities.Token;
 import com.danarg.pncontrollerseccion01.domain.entities.User;
 import com.danarg.pncontrollerseccion01.repositories.TokenRepository;
 import com.danarg.pncontrollerseccion01.repositories.UserRepository;
 import com.danarg.pncontrollerseccion01.services.UserService;
 import com.danarg.pncontrollerseccion01.utils.JWTTools;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -41,8 +38,8 @@ public class UserServiceImpl implements UserService {
     public void create(UserRegisterDTO info) {
         User user = new User();
         user.setUsername(info.getUsername());
-        user.setEmail(info.getEmail());
         user.setPassword(passwordEncoder.encode(info.getPassword()));
+        user.setEmail(info.getEmail());
         userRepository.save(user);
     }
 
@@ -71,15 +68,6 @@ public class UserServiceImpl implements UserService {
         return !user.getPassword().equals(password);
     }
 
-    @Override
-    public void edit(UserEditDTO info) {
-        User user = findByIdentifier(info.getUsername());
-
-        if (user != null) {
-            user.setEmail(info.getEmail());
-            userRepository.save(user);
-        }
-    }
 
     @Override
     @Transactional(rollbackOn = Exception.class)
@@ -140,6 +128,17 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.findByUsernameOrEmail(username, username).orElse(null);
 
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void updatePassword(String identifier, String newPassword) {
+        User user = findByIdentifier(identifier);
+        if (user == null) {
+            throw new EntityNotFoundException("User not found with identifier: " + identifier);
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 
 }

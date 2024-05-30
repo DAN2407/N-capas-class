@@ -112,7 +112,7 @@ public class LibraryRestController {
 //Loans
     @PostMapping("/loan-book")
     public ResponseEntity<GeneralResponse> loanBook(@RequestBody @Valid CreateBookLoanDTO info){
-        User user = userService.findByUsernameOrEmail(info.getUsername(), info.getUsername());
+        User user = userService.findByIdentifier(info.getUsername());
         if(user == null){
             return GeneralResponse.getResponse(HttpStatus.BAD_REQUEST, "User not found", null);
         }

@@ -8,7 +8,6 @@ import lombok.Data;
 public class CreateBookLoanDTO {
     @NotNull
     private int loanDays;
-
     @NotBlank
     private String username;
     @NotBlank

@@ -1,14 +1,16 @@
 package com.danarg.pncontrollerseccion01.controllers;
 
-import com.danarg.pncontrollerseccion01.domain.dtos.*;
-
+import com.danarg.pncontrollerseccion01.domain.dtos.TokenDTO;
+import com.danarg.pncontrollerseccion01.domain.dtos.UserChangesDTO;
+import com.danarg.pncontrollerseccion01.domain.dtos.UserLoginDTO;
+import com.danarg.pncontrollerseccion01.domain.dtos.UserRegisterDTO;
+import com.danarg.pncontrollerseccion01.domain.dtos.GeneralResponse;
 import com.danarg.pncontrollerseccion01.domain.entities.Token;
 import com.danarg.pncontrollerseccion01.domain.entities.User;
 import com.danarg.pncontrollerseccion01.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -37,7 +39,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<GeneralResponse> login(@ModelAttribute @Valid UserLoginDTO info) throws Exception {
+    public ResponseEntity<GeneralResponse> login(@RequestBody @Valid UserLoginDTO info) throws Exception {
         User user = userService.findByIdentifier(info.getIdentifier());
         if(user == null){
             return GeneralResponse.getResponse(HttpStatus.CONFLICT, "User not found");
