@@ -1,16 +1,14 @@
 package com.danarg.pncontrollerseccion01.controllers;
 
 import com.danarg.pncontrollerseccion01.domain.dtos.ChangePasswordDTO;
+import com.danarg.pncontrollerseccion01.domain.dtos.ChangeRolesDTO;
 import com.danarg.pncontrollerseccion01.domain.dtos.GeneralResponse;
 import com.danarg.pncontrollerseccion01.domain.entities.User;
 import com.danarg.pncontrollerseccion01.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
@@ -33,5 +31,17 @@ public class UserController {
         } catch (Exception e) {
             return GeneralResponse.getResponse(HttpStatus.EXPECTATION_FAILED, "Could not update password");
         }
+    }
+
+    @PostMapping("change-roles")
+    public ResponseEntity<?> changeRoles(@RequestBody ChangeRolesDTO info) {
+        User user = userService.findByIdentifier(info.getIdentifier());
+        if(user == null) {
+            return GeneralResponse.getResponse(HttpStatus.NOT_FOUND, "User not found");
+        }
+
+        userService.changeRoles(user.getUsername(), info.getRoles());
+
+        return GeneralResponse.getResponse(HttpStatus.OK, "Roles changed successfully");
     }
 }

@@ -1,8 +1,12 @@
 package com.danarg.pncontrollerseccion01.services;
 
 import com.danarg.pncontrollerseccion01.domain.dtos.UserRegisterDTO;
+import com.danarg.pncontrollerseccion01.domain.entities.Role;
 import com.danarg.pncontrollerseccion01.domain.entities.Token;
 import com.danarg.pncontrollerseccion01.domain.entities.User;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
 
 public interface UserService {
     User findByIdentifier(String identifier);
@@ -18,4 +22,8 @@ public interface UserService {
     void updatePassword(String identifier, String newPassword);
 
 
+    //roles
+    void changeRoles(String username, @NotNull List<String> role);
+    Role getRoleById(String role);
+    List<Role> getRoles();
 }

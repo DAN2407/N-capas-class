@@ -1,17 +1,22 @@
 package com.danarg.pncontrollerseccion01.services.impls;
 
 import com.danarg.pncontrollerseccion01.domain.dtos.UserRegisterDTO;
+import com.danarg.pncontrollerseccion01.domain.entities.Role;
 import com.danarg.pncontrollerseccion01.domain.entities.Token;
 import com.danarg.pncontrollerseccion01.domain.entities.User;
+import com.danarg.pncontrollerseccion01.repositories.RoleRepository;
 import com.danarg.pncontrollerseccion01.repositories.TokenRepository;
 import com.danarg.pncontrollerseccion01.repositories.UserRepository;
 import com.danarg.pncontrollerseccion01.services.UserService;
 import com.danarg.pncontrollerseccion01.utils.JWTTools;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,14 +27,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
 
 
-    public UserServiceImpl(UserRepository userRepository, JWTTools jwtTools, TokenRepository tokenRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, JWTTools jwtTools, TokenRepository tokenRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.jwtTools = jwtTools;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
     }
 
 
@@ -40,6 +47,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(info.getUsername());
         user.setPassword(passwordEncoder.encode(info.getPassword()));
         user.setEmail(info.getEmail());
+        user.setRoles(roles);
         userRepository.save(user);
     }
 
@@ -140,6 +148,36 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
+
+    @Override
+    public void changeRoles(String username, @NotNull List<String> role) {
+        User user = userRepository.findByUsernameOrEmail(username, username).orElse(null);
+        if(user == null) {
+            throw new EntityNotFoundException("User not found with username: " + username);
+        }
+
+        List<Role> roles = new ArrayList<>();
+        role.forEach(r -> {
+            Role role1 = roleRepository.findById(r).orElse(null);
+            if(role1 != null) {
+                roles.add(role1);
+            }
+        });
+
+        user.setRoles(roles);
+        userRepository.save(user);
+    }
+
+    @Override
+    public Role getRoleById(String role) {
+        return roleRepository.findById(role).orElse(null);
+    }
+
+    @Override
+    public List<Role> getRoles() {
+        return roleRepository.findAll();
+    }
+
 
 }
 
