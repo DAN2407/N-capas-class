@@ -43,11 +43,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public void create(UserRegisterDTO info) {
+        //busueda de roles por
         User user = new User();
         user.setUsername(info.getUsername());
         user.setPassword(passwordEncoder.encode(info.getPassword()));
         user.setEmail(info.getEmail());
-        user.setRoles(roles);
+        user.setRoles(info.getRole());
         userRepository.save(user);
     }
 

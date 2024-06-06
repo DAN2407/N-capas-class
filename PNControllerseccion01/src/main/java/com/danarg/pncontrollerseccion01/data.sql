@@ -12,4 +12,3 @@ INSERT INTO sec01_categories (code, name) VALUES ('CAT008', 'Category 8') ON CON
 INSERT INTO "sec01_roles" VALUES ('USER', 'user') ON CONFLICT ("id") DO UPDATE SET "name" = EXCLUDED."name";
 INSERT INTO "sec01_roles" VALUES ('LBRN', 'librarian') ON CONFLICT ("id") DO UPDATE SET "name" = EXCLUDED."name";
 INSERT INTO "sec01_roles" VALUES ('SUDO', 'sysadmin') ON CONFLICT ("id") DO UPDATE SET "name" = EXCLUDED."name";
- */

@@ -1,9 +1,12 @@
 package com.danarg.pncontrollerseccion01.domain.dtos;
 
+import com.danarg.pncontrollerseccion01.domain.entities.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class UserRegisterDTO {
@@ -16,6 +19,7 @@ public class UserRegisterDTO {
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$" , message = "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y caracteres especiales")
     //TODO: pattern seguro
     private String password;
+    private List<Role> role;
 
 
 
